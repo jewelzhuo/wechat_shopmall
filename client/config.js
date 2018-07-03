@@ -21,7 +21,11 @@ var config = {
         tunnelUrl: `${host}/weapp/tunnel`,
 
         // 上传图片接口
-        uploadUrl: `${host}/weapp/upload`
+        uploadUrl: `${host}/weapp/upload`,
+
+        productList: `${host}/weapp/product`,
+        
+        productDetail: `${host}/weapp/product/`
     }
 };
 
