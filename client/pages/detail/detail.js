@@ -37,14 +37,14 @@ Page({
             product: data.data
           })
         } else {
-          setTimeout(() => {
+          setTimeout(function() {
             wx.navigateBack()
           }, 2000) 
         }        
       },
       fail: function() {
         wx.hideLoading();
-        setTimeout(() => {
+        setTimeout(function() {
           wx.navigateBack()
         }, 2000) 
       }
