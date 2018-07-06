@@ -15,25 +15,24 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    this.getProduct(options.id)  
+    this.getProduct(options.id)
   },
 
   getProduct(id) {
-    var that = this;
     wx.showLoading({
       title: '商品数据加载中...',
     })
 
     qcloud.request({
       url: config.service.productDetail + id,
-      success: function(result) {
+      success: result => {
         wx.hideLoading();
 
         let data = result.data;
         console.log(data);
 
         if (!data.code) {
-          that.setData({
+          this.setData({
             product: data.data
           })
         } else {
@@ -49,6 +48,52 @@ Page({
         }, 2000) 
       }
     })
+  },
+
+  buy() {
+    wx.showLoading({
+      title: '商品购买中...',
+    })
+    
+    let product = Object.assign(
+      {count: 1}, 
+      this.data.product
+    )
+
+    qcloud.request({
+      url: config.service.addOrder,
+      login: true,
+      method: 'POST',
+      data: {
+        list: [product]
+      },
+      success: result => {
+        wx,wx.hideLoading()
+
+        let data = result.data
+
+        if(!data.code) {
+          wx.showToast({
+            icon: 'none',
+            title: '商品购买成功'
+          })
+        } else {
+          wx.showToast({
+            icon: 'none',
+            title: '商品购买失败'
+          })
+        }
+      },
+      fail: () => {
+        wx.hideLoading()
+
+        wx.showToast({
+          icon: 'none',
+          title: '商品购买失败'
+        })
+      }
+    })
+
   },
 
   /**
