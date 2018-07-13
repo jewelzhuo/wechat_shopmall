@@ -21,7 +21,7 @@ Page({
   getProductList() {
     var that = this;
     wx.showLoading({
-      title: '商品数据加载中...',
+      title: '商品数据加载中',
     })
 
     qcloud.request({
@@ -50,6 +50,48 @@ Page({
         }) 
       }
     })
+  },
+
+  addToTrolley(event) {
+    let productId = event.currentTarget.dataset.id
+    let productList = this.data.productList
+    let product
+
+    for (let i = 0; i < productList.length; i++) {
+      if (productList[i].id === productId) {
+        product = productList[i]
+        break
+      }
+    }
+
+    if (product) {
+      qcloud.request({
+        url: config.service.addTrolley,
+        login: true,
+        method: 'PUT',
+        data: product,
+        success: result => {
+          let data = result.data
+
+          if (!data.code) {
+            wx.showToast({
+              title: '已添加到购物车',
+            })
+          } else {
+            wx.showToast({
+              icon: 'none',
+              title: '添加到购物车失败',
+            })
+          }
+        },
+        fail: () => {
+          wx.showToast({
+            icon: 'none',
+            title: '添加到购物车失败',
+          })
+        }
+      })
+    }
   },
 
   /**
