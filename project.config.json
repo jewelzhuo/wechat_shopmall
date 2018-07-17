@@ -23,12 +23,12 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 1,
+			"current": -1,
 			"list": [
 				{
-					"id": -1,
-					"name": "商品详情页",
-					"pathName": "pages/detail/detail",
+					"id": 0,
+					"name": "add-comment",
+					"pathName": "pages/add-comment/add-comment",
 					"query": ""
 				},
 				{

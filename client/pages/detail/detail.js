@@ -8,8 +8,7 @@ Page({
    * 页面的初始数据
    */
   data: {
-    product: {},
-    isInstantBuy: true
+    product: {} 
   },
 
   getProduct(id) {
@@ -59,7 +58,8 @@ Page({
       login: true,
       method: 'POST',
       data: {
-        list: [product]
+        list: [product],
+        isInstantBuy: true
       },
       success: result => {
         wx.hideLoading()
@@ -124,6 +124,15 @@ Page({
       }
     })
 
+  },
+
+  onTapCommentEntry() {
+    let product = this.data.product
+    if (product.commentCount) {
+      wx.navigateTo({
+        url: `/pages/comment/comment?id=${product.id}&price=${product.price}&name=${product.name}&image=${product.image}`
+      })
+    }
   },
 
   /**
