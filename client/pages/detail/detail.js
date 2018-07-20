@@ -22,7 +22,7 @@ Page({
         wx.hideLoading()
 
         let data = result.data
-        console.log(data);
+        //console.log(data);
 
         if (!data.code) {
           this.setData({

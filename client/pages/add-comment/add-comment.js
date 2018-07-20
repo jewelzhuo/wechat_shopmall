@@ -9,11 +9,78 @@ Page({
   data: {
     product: {},
     commentValue: '',
+    commentImages: [],
+  },
+
+  uploadImage(cb) {
+    let commentImages = this.data.commentImages
+    let images = []
+
+    if (commentImages.length) {
+      let length = commentImages.length
+      for (let i = 0; i < length; i++) {
+        wx.uploadFile({
+          url: config.service.uploadUrl,
+          filePath: commentImages[i],
+          name: 'file',
+          success: res => {
+            let data = JSON.parse(res.data)
+            length--
+
+            if (!data.code) {
+              images.push(data.data.imgUrl)
+            }
+
+            if (length <= 0) {
+              cb && cb(images)
+            }
+          },
+          fail: () => {
+            length--
+          }
+        })
+      }
+    } else {
+      cb && cb(images)
+    }
   },
 
   onInput(event) {
     this.setData({
       commentValue: event.detail.value.trim()
+    })
+  },
+
+  chooseImage() {
+    let currentImages = this.data.commentImages
+
+    wx.chooseImage({
+      count: 3,
+      sizeType: ['compressed'],
+      sourceType: ['album', 'camera'],
+      success: res => {
+
+        currentImages = currentImages.concat(res.tempFilePaths)
+
+        let end = currentImages.length
+        let begin = Math.max(end - 3, 0)
+        currentImages = currentImages.slice(begin, end)
+
+        this.setData({
+          commentImages: currentImages
+        })
+
+      },
+    })
+  },
+
+  previewImg(event) {
+    let target = event.currentTarget
+    let src = target.dataset.src
+
+    wx.previewImage({
+      current: src,
+      urls: this.data.commentImages
     })
   },
 
@@ -24,43 +91,46 @@ Page({
     wx.showLoading({
       title: '正在发表评论'
     })
-    
-    qcloud.request({
-      url: config.service.addComment,
-      login: true,
-      method: 'PUT',
-      data: {
-        content: content,
-        product_id: this.data.product.id
-      },
-      success: result => {
-        wx.hideLoading()
 
-        let data = result.data
+    this.uploadImage(images => {
+      qcloud.request({
+        url: config.service.addComment,
+        login: true,
+        method: 'PUT',
+        data: {
+          images,
+          content,
+          product_id: this.data.product.id
+        },
+        success: result => {
+          wx.hideLoading()
 
-        if (!data.code) {
-          wx.showToast({
-            title: '发表评论成功'
-          })
-          setTimeout(() => {
-            wx.navigateBack()
-          }, 1500)
+          let data = result.data
 
-        } else {
+          if (!data.code) {
+            wx.showToast({
+              title: '发表评论成功'
+            })
+
+            setTimeout(() => {
+              wx.navigateBack()
+            }, 1500)
+          } else {
+            wx.showToast({
+              icon: 'none',
+              title: '发表评论失败'
+            })
+          }
+        },
+        fail: () => {
+          wx.hideLoading()
+
           wx.showToast({
             icon: 'none',
             title: '发表评论失败'
           })
         }
-      },
-      fail: (err) => {
-        wx.hideLoading()
-        console.log(err)
-        wx.showToast({
-          icon: 'none',
-          title: '发表评论失败'
-        })
-      }
+      })
     })
   },
 
